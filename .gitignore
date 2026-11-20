@@ -3,3 +3,6 @@ pokedexcli
 
 # log files
 *.log
+
+#swp files
+*.swp

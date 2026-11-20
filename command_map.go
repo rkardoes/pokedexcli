@@ -3,7 +3,7 @@ package main
 import(
 	"fmt"
 	"https://github.com/rkardoes/pokedexcli/internal/pokeapi"
-}
+)
 
 type mapPageItem struct {
 	Name 	string 	`json: "name"`
