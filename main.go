@@ -25,7 +25,7 @@ func main() {
 			callback:	commandMapb,
 			},
         	},
-	page:		0,
+	mapPage:		0,
 
 	}
 

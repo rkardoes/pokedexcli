@@ -16,7 +16,11 @@ type cliCommand struct {
 
 type config struct {
 	commands	map[string]cliCommand;
-	page		int;
+	mapPage		int;
+}
+
+func (c *config) changeMapPage(d int) {
+	c.mapPage += d
 }
 
 func cleanInput(text string) []string {
