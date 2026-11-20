@@ -43,6 +43,9 @@ func startRepl(cfg *config) {
 			fmt.Println("Unknown command")
 			continue
 		}
-		cmd.callback(cfg)
+		if err := cmd.callback(cfg); err != nil {
+			fmt.Printf("ERROR: %#v\n", err)
+			commandExit(cfg)
+		}
 	}
 }

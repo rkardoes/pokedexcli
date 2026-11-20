@@ -6,47 +6,60 @@ import(
 )
 
 type mapPageItem struct {
-	Name 	string 	`json: "name"`
-	URL 	string 	`json: "url"`
+	Name 	string 	`json:"name"`
+	URL 	string 	`json:"url"`
 }
 
-type mapPageResults struct {
-	Count		int
-	Resutls 	[]mapPageItem
-	Next		string
-	Previous	string
+type mapPageResult struct {
+	Count		int 		`json:"count"`
+	Results 	[]mapPageItem 	`json:"results"`
+	Next		string		`json:"next"`
+	Previous	string		`json:"previous"`
 }
 
 func commandMap(cfg *config) error {
-	defer cfg.changeMaPpage(1)
-	var e pokeapi.mapAreaEndopint
-	var err Error
+	defer cfg.changeMapPage(1)
+	var e pokeapi.MapAreaEndpoint
+	var err error
+	var pageResult mapPageResult
 
-	pageResults := make([]mapPageResults, 20)
-
-	offset := 20 * config.page
+	offset := 20 * (cfg.mapPage)
 	q := fmt.Sprintf("limit=%d&offset=%d", 20, offset)
-	if e.URL, err := pokeapi.makeUrl("https://pokeapi.co/api/v2/location-area/", [q]); err != nil {
+	if e.URL, err = pokeapi.MakeUrl("location-area/", []string{q}); err != nil {
 		return err
 	}
 	
-	if resp, err := pokeapi.callEndpoint(e); err != nil {
+	resp, err := pokeapi.CallEndpoint(e) 
+	if err != nil {
 		return err
 	}
 
-	if pageResults, err = pokeapi.respToStructs(resp, pageResults); err != nil {
+	defer resp.Body.Close()
+
+	pageResult, err = pokeapi.RespToStructs[mapPageResult](resp)
+	if err != nil {
 		return err
 	}
-	
-	if len(pageResults) > 1 {
-		return fmt.Errorf("mapPageResults came back greater than 1: (%d)", len(pageResults))
+
+	if len(pageResult.Results) > 20 {
+		return fmt.Errorf("map returned more than 20 location areas: (%d)", len(pageResult.Results))
 	}
-	if len(pageResults[0].Results) > 20 {
-		return fmt.Errorf("map returned more than 20 location areas: (%d)", len(pageResults.Results))
-	}
-	for r := range pageResults[0].Results {
+	for _, r := range pageResult.Results {
 		fmt.Printf("%s\n", r.Name)
 	}
 	return nil
 	
+}
+
+func commandMapb(cfg *config) error {
+	if cfg.mapPage - 2 < 0 {
+		fmt.Printf("you're on the first page\n")
+		cfg.mapPage = 0
+		return nil
+	}
+	cfg.changeMapPage(-2)
+	if err := commandMap(cfg); err != nil {
+		return err
+	}
+	return nil
 }
