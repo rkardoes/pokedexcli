@@ -1,2 +1,5 @@
 # executable
 pokedexcli
+
+# log files
+*.log
